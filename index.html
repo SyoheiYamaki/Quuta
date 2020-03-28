@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ニュースサイト | Enclass+</title>
+    <title>Quuta | Enclass+</title>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
   </head>
   <body>
     <div id="app" class="news">
@@ -22,9 +22,10 @@
         <el-menu-item index="2">
           <el-input placeholder="Please input" v-model="searchWord"></el-input>
         </el-menu-item>
-        <el-menu-item index="3">
+        <!-- 自動検索を実行したため、一時的にコメントアウト -->
+        <!-- <el-menu-item index="3">
           <el-button type="primary" icon="el-icon-search" id="searchButton" @click="onChangeSearch">Search</el-button>
-        </el-menu-item>
+        </el-menu-item> -->
       </el-menu>
 
       <div v-if="errorFlg">
@@ -53,71 +54,20 @@
     el: '#app',
     data() {
       return {
-        searchWord: '',
-        results: [
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          },
-          {
-            title: 'テスト投稿',
-            body: 'テスト投稿本文',
-            url: 'https://google.com'
-          }
-        ],
+        searchWord: '', // 検索ワード
+        results: [],    // 結果一覧
         errorFlg: false,
         loading: false
       }
     },
     watch: {
       searchWord: function() {
-        // 入力をを監視してAPI検索
+        // 入力を監視してAPI検索実行
         this.debouncedGetPosts();
       }
     },
     created: function () {
-      this.debouncedGetPosts = _.debounce(this.onChangeSearch, 500)
+      this.debouncedGetPosts = _.debounce(this.onChangeSearch, 800)
     },
     methods: {
       onChangeSearch: function() {
@@ -133,7 +83,6 @@
 
         axios.get(QiitaAPI, params).then(function (response) {
             app.results = response.data;
-            console.log(response.data);
             this.loading = false
           })
           .catch(function (error) {
@@ -147,7 +96,7 @@
 
   window.onload = function(){
     // 初期表示
-    // app.getPosts();
+    app.getPosts();
   }
   </script>
 
