@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ニュースサイト | Enclass+</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.core.min.js"></script>
+  </head>
+  <body>
+    <div id="app" class="news">
+      <el-menu
+        class="el-menu-demo"
+        mode="horizontal"
+        background-color="#545c64"
+        text-color="#fff"
+        active-text-color="#ffd04b">
+        <el-menu-item index="1">Quutaサイト</el-menu-item>
+        <el-menu-item index="2">
+          <el-input placeholder="Please input" v-model="searchWord"></el-input>
+        </el-menu-item>
+        <el-menu-item index="3">
+          <el-button type="primary" icon="el-icon-search" id="searchButton" @click="onChangeSearch">Search</el-button>
+        </el-menu-item>
+      </el-menu>
+
+      <div v-if="errorFlg">
+        残念！
+      </div>
+
+      <div v-else>
+        <div class="news-resulteWrap" v-loading="loading">
+          <el-row>
+            <el-col :span="6" v-for="(result, index) in results" :key="index" class="news-resultListItem">
+              <a v-bind:href="result.url" target="_blank">
+              <el-card class="box-card">
+                <p>{{ result.title }} </p>
+                <p class="api_text">{{ result.body.substr( 0, 50 ) }}</p>
+              </el-card>
+              </a>
+            </el-col>
+          </el-row>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+  var app = new Vue({
+    el: '#app',
+    data() {
+      return {
+        searchWord: '',
+        results: [
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          },
+          {
+            title: 'テスト投稿',
+            body: 'テスト投稿本文',
+            url: 'https://google.com'
+          }
+        ],
+        errorFlg: false,
+        loading: false
+      }
+    },
+    watch: {
+      searchWord: function() {
+        // 入力をを監視してAPI検索
+        this.debouncedGetPosts();
+      }
+    },
+    created: function () {
+      this.debouncedGetPosts = _.debounce(this.onChangeSearch, 500)
+    },
+    methods: {
+      onChangeSearch: function() {
+        this.getPosts({
+          params: {
+            query: app.searchWord
+          }
+        })
+      },
+      getPosts: function(params) {
+        const QiitaAPI = 'https://qiita.com/api/v2/items'
+        var vm = this;
+
+        axios.get(QiitaAPI, params).then(function (response) {
+            app.results = response.data;
+            console.log(response.data);
+            this.loading = false
+          })
+          .catch(function (error) {
+            console.log(error);
+            this.loading = false
+            this.errorFlg = true
+          })
+      }
+    }
+  })
+
+  window.onload = function(){
+    // 初期表示
+    // app.getPosts();
+  }
+  </script>
+
+  <style>
+  body {
+    margin: 0;
+  }
+  a {
+    text-decoration: none;
+  }
+  .el-low {
+    margin: 15px;
+  }
+  .el-card {
+    margin: 5px;
+  }
+  .el-card:hover {
+    opacity: .7;
+  }
+  .api_text {
+    font-size: 0.5em;
+  }
+
+  </style>
+</html>
+
