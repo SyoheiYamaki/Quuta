@@ -18,33 +18,30 @@
         background-color="#545c64"
         text-color="#fff"
         active-text-color="#ffd04b">
+        <div class="header-inner">
         <el-menu-item index="1">Quutaサイト</el-menu-item>
         <el-menu-item index="2">
-          <el-input placeholder="Please input" v-model="searchWord"></el-input>
+          <el-input placeholder="検索キーワードを入力" v-model="searchWord"></el-input>
         </el-menu-item>
         <!-- 自動検索を実行したため、一時的にコメントアウト -->
         <!-- <el-menu-item index="3">
           <el-button type="primary" icon="el-icon-search" id="searchButton" @click="onChangeSearch">Search</el-button>
         </el-menu-item> -->
+        </div>
       </el-menu>
 
-      <div v-if="errorFlg">
-        残念！
-      </div>
-
-      <div v-else>
-        <div class="news-resulteWrap" v-loading="loading">
-          <el-row>
-            <el-col :span="6" v-for="(result, index) in results" :key="index" class="news-resultListItem">
-              <a v-bind:href="result.url" target="_blank">
-              <el-card class="box-card">
-                <p>{{ result.title }} </p>
-                <p class="api_text">{{ result.body.substr( 0, 50 ) }}</p>
-              </el-card>
-              </a>
-            </el-col>
-          </el-row>
-        </div>
+      <div class="news-resulteWrap" v-loading="loading">
+        <ul>
+          <li v-for="(result, index) in results" :key="index" class="news-resultListItem">
+            <a :href="result.url" target="_blank">
+              <p>{{ result.title }} </p>
+            </a>
+            <el-tag @click="onSearchTag(tag.name)" type="info" size="mini" v-for="tag in result.tags">{{ tag.name }}</el-tag>
+            <a :href="result.url" target="_blank">
+              <p class="api_text">{{ result.body.substr( 0, 50 ) }}</p>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   </body>
@@ -56,7 +53,6 @@
       return {
         searchWord: '', // 検索ワード
         results: [],    // 結果一覧
-        errorFlg: false,
         loading: false
       }
     },
@@ -69,6 +65,9 @@
     created: function () {
       this.debouncedGetPosts = _.debounce(this.onChangeSearch, 800)
     },
+    mounted: function() {
+      this.getPosts();
+    },
     methods: {
       onChangeSearch: function() {
         this.getPosts({
@@ -77,35 +76,75 @@
           }
         })
       },
-      getPosts: function(params) {
+      async getPosts(params) {
+        this.loading = true
         const QiitaAPI = 'https://qiita.com/api/v2/items'
         var vm = this;
 
-        axios.get(QiitaAPI, params).then(function (response) {
+        await axios.get(QiitaAPI, params).then(function (response) {
             app.results = response.data;
-            this.loading = false
           })
           .catch(function (error) {
             console.log(error);
-            this.loading = false
-            this.errorFlg = true
           })
+        this.loading = false
+      },
+      onSearchTag(name) {
+        this.searchWord = name
       }
     }
   })
-
-  window.onload = function(){
-    // 初期表示
-    app.getPosts();
-  }
   </script>
 
-  <style>
+  <style lang="scss">
   body {
     margin: 0;
+    background-color: #ededed;
+  }
+  ul {
+    margin: 0;
+  }
+  li {
+    list-style: none;
   }
   a {
     text-decoration: none;
+    color: black;
+  }
+  p {
+    margin: 20px 0 10px;
+  }
+  .header-inner {
+    max-width: 940px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+  }
+  .el-input__inner {
+    width: 300px;
+  }
+  .el-tag {
+    cursor: pointer;
+  }
+  .el-tag + .el-tag {
+    margin-left: 4px;
+  }
+  .news-resulteWrap {
+    max-width: 940px;
+    margin: 40px auto 0;
+    background-color: #ffffff;
+  }
+  .news-resultListItem {
+    position: relative;
+    padding: 15px 0;
+  }
+  .news-resultListItem:after {
+    content: ' ';
+    position: absolute;
+    bottom: -7px;
+    width: 96%;
+    height: 1px;
+    background-color: #c6c6c6;
   }
   .el-low {
     margin: 15px;
